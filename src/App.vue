@@ -20,16 +20,22 @@
 
     <v-main>
       <v-container mt-8>
+        <v-row>
+          <span class="text-h5"> Total: {{ total }} PLN </span>
+        </v-row>
         <v-row justify="center">
           <v-col cols="10" sm="12" md="12" lg="10" xl="8">
-            <price-chart></price-chart>
+            <price-chart
+              v-if="isChartReady"
+              :chartData="chartData"
+            ></price-chart>
           </v-col>
         </v-row>
         <v-row class="mt-4" justify="center">
-          <v-btn @click="getAllegroData">getAllegroData</v-btn>
+          <v-btn @click="getAllegroData">refresh</v-btn>
         </v-row>
-        <v-row class="mt-4" justify="center">
-          {{ allegroData }}
+        <v-row v-if="false" class="mt-4" justify="center">
+          {{ chartData }}
         </v-row>
       </v-container>
     </v-main>
@@ -37,8 +43,10 @@
 </template>
 
 <script>
+/* eslint-disable */
 import PriceChart from "./components/PriceChart";
 import axios from "axios";
+import Vue from "vue";
 
 export default {
   name: "App",
@@ -48,34 +56,75 @@ export default {
   },
 
   data: () => ({
-    allegroData: "testing",
+    allegroData: null,
+    chartData: { datasets: [], labels: [] },
     CLIENT_ID: "cc8c81263a534b61ac72a64498688613",
     CLIENT_SECRET:
       "HtAXopcFIa8V4RX2ctmkhx4v1VqOxq6IwoE8nERWvDQcmpAAZepblwwSEi2GSY7E",
   }),
 
+  computed: {
+    total() {
+      if (!!!this.allegroData) return 0;
+      let total = this.allegroData
+        .map((el) => el.price)
+        .reduce((pv, cv) => pv + cv, 0);
+      total = Math.round(total * 100) / 100;
+      return total;
+    },
+
+    isChartReady() {
+      return !!this.chartData.datasets[0];
+    },
+  },
+
   mounted() {},
 
   methods: {
     getAllegroData() {
-      //let url = "https://api.allegro.pl/sale/categories/2";
-      let encodedSecret = btoa(this.CLIENT_ID + ":" + this.CLIENT_SECRET);
-
-      let urlAuthorization = "https://allegro.pl/auth/oauth/token";
-      return axios
-        .post(
-          urlAuthorization,
-          { grant_type: "client_credentials" },
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              "Access-Control-Allow-Origin": "*",
-              'Authorization': "Basic " + encodedSecret,
-            },
-          }
-        )
-        .then((res) => (this.allegroData = res));
+      let url = "https://allegro.pl/uzytkownik/Viva_Interwencje";
+      return axios.get(url).then((res) => {
+        this.allegroData = this.parseResponse(res);
+        console.log(res);
+      });
     },
+    parseResponse(data) {
+      let parsedRes = Object.values(
+        data.data["pagination top"].collection.elements
+      )
+        .splice(1)
+        .map((auction) => {
+          return {
+            name: auction.name,
+            price: Number(auction.sellingMode.auction.price.amount),
+            url: auction.seo.url,
+          };
+        });
+
+      parsedRes = parsedRes.sort((a, b) => (a.price > b.price ? -1 : 1));
+      let datasetsAndLabels = this.getChartDataFromAllegro(parsedRes);
+      Vue.set(this.chartData, "datasets", datasetsAndLabels.datasets);
+      Vue.set(this.chartData, "labels", datasetsAndLabels.labels);
+      return parsedRes;
+    },
+
+    getChartDataFromAllegro(allegroData) {
+      let labels = allegroData.map((el) => el.name);
+      let prices = allegroData.map((el) => el.price);
+      let datasets = [
+        {
+          label: "Ceny",
+          backgroundColor: "#f87979",
+          pointBackgroundColor: "white",
+          borderWidth: 1,
+          pointBorderColor: "#249EBF",
+          data: prices,
+        },
+      ];
+
+      return { labels, datasets };
+    },
+
     async sleep(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     },
