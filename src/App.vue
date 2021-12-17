@@ -113,7 +113,7 @@ export default {
     },
 
     getChartDataFromAllegro(allegroData) {
-      let labels = allegroData.map((el) => el.name.split(/(\s+)/).slice(0,3));
+      let labels = allegroData.map((el) => el.name);
       let prices = allegroData.map((el) => el.price);
       let datasets = [
         {
