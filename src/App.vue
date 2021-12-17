@@ -31,7 +31,7 @@
             ></price-chart>
           </v-col>
         </v-row>
-        <v-row class="mt-4" justify="center">
+        <v-row v-if="false" class="mt-4" justify="center">
           <v-btn @click="getAllegroData">refresh</v-btn>
         </v-row>
         <v-row v-if="false" class="mt-4" justify="center">
@@ -78,7 +78,9 @@ export default {
     },
   },
 
-  mounted() {},
+  mounted() {
+    this.getAllegroData();
+  },
 
   methods: {
     getAllegroData() {
