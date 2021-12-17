@@ -14,6 +14,11 @@ export default {
   data() {
     return {
       options: {
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
         scales: {
           yAxes: [
             {

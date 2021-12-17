@@ -3,7 +3,7 @@
     <v-app-bar app color="primary" dark>
       <v-row>
         <v-col>
-          <span class="text-h5">Viva! Interwencje</span>
+          <span class="text-h6">Viva! Interwencje</span>
         </v-col>
         <v-col class="text-right">
           <v-btn
@@ -21,10 +21,12 @@
     <v-main>
       <v-container mt-8>
         <v-row>
-          <span class="text-h5"> Total: {{ total }} PLN </span>
+          <v-col>
+            <span class="text-h5"> Total: {{ total }} PLN </span>
+          </v-col>
         </v-row>
         <v-row justify="center">
-          <v-col cols="10" sm="12" md="12" lg="10" xl="8">
+          <v-col cols="12" sm="12" md="12" lg="10" xl="8">
             <price-chart
               v-if="isChartReady"
               :chartData="chartData"
@@ -111,7 +113,7 @@ export default {
     },
 
     getChartDataFromAllegro(allegroData) {
-      let labels = allegroData.map((el) => el.name);
+      let labels = allegroData.map((el) => el.name.split(/(\s+)/)[0]);
       let prices = allegroData.map((el) => el.price);
       let datasets = [
         {
