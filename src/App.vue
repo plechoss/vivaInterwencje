@@ -80,7 +80,7 @@ export default {
     },
   },
 
-  mounted() {
+  created() {
     this.getAllegroData();
   },
 
@@ -113,7 +113,7 @@ export default {
     },
 
     getChartDataFromAllegro(allegroData) {
-      let labels = allegroData.map((el) => el.name.split(/(\s+)/)[0]);
+      let labels = allegroData.map((el) => el.name.split(/(\s+)/).slice(0,3));
       let prices = allegroData.map((el) => el.price);
       let datasets = [
         {
