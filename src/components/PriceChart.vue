@@ -9,35 +9,10 @@ export default {
 
   mixins: [reactiveProp],
 
+  props: ["chartData"],
+
   data() {
     return {
-      startData: {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ],
-        datasets: [
-          {
-            label: "Data One",
-            backgroundColor: "#f87979",
-            pointBackgroundColor: "white",
-            borderWidth: 1,
-            pointBorderColor: "#249EBF",
-            data: [40, 20, 30, 50, 90, 10, 20, 40, 50, 70, 90, 100],
-          },
-        ],
-      },
-
       options: {
         scales: {
           yAxes: [
@@ -69,7 +44,7 @@ export default {
           mode: "single",
           callbacks: {
             label: function (tooltipItems) {
-              return "$" + tooltipItems.yLabel;
+              return tooltipItems.yLabel + " PLN";
             },
           },
         },
@@ -84,7 +59,7 @@ export default {
 
   methods: {
     render() {
-      this.renderChart(this.startData, this.options);
+      this.renderChart(this.chartData, this.options);
     },
   },
 
